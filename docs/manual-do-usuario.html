@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitara OBD — Manual do usuário</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #eceff4;
+    --text: #1b2230;
+    --muted: #5a6577;
+    --border: #d8dde6;
+    --accent: #0b63c5;
+    --accent-soft: #e2eefc;
+    --ok: #1a7f3c;
+    --ok-soft: #e1f4e7;
+    --warn: #8a5a00;
+    --warn-soft: #fff1cc;
+    --danger: #b3261e;
+    --danger-soft: #fde6e4;
+    --shadow: 0 1px 2px rgba(20, 30, 50, .06), 0 4px 14px rgba(20, 30, 50, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10141a;
+      --surface: #19202a;
+      --surface-2: #222b37;
+      --text: #e7ebf1;
+      --muted: #9aa6b7;
+      --border: #2e3948;
+      --accent: #6db3ff;
+      --accent-soft: #1a2e47;
+      --ok: #6fd18c;
+      --ok-soft: #163123;
+      --warn: #f2c14e;
+      --warn-soft: #3a2f12;
+      --danger: #ff8a80;
+      --danger-soft: #3d1c1a;
+      --shadow: none;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 32px;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 24px 16px 72px;
+  }
+
+  nav.toc {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    font-size: 14px;
+  }
+  nav.toc p {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; }
+  nav.toc a {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--accent); }
+
+  main { min-width: 0; }
+
+  header.hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px;
+    box-shadow: var(--shadow);
+  }
+  header.hero h1 { margin: 0 0 6px; font-size: 30px; line-height: 1.2; }
+  header.hero .sub { margin: 0 0 14px; color: var(--muted); font-size: 17px; }
+  header.hero p { margin: 0 0 10px; }
+  header.hero p:last-child { margin-bottom: 0; }
+
+  section { margin-top: 40px; }
+  h2 {
+    font-size: 23px;
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 { font-size: 18px; margin: 28px 0 10px; }
+  p { margin: 0 0 12px; }
+  a { color: var(--accent); }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  ul li { margin-bottom: 6px; }
+
+  .note {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    margin: 0 0 14px;
+  }
+  .note.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .note.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .note.danger { border-color: var(--danger); background: var(--danger-soft); }
+  .note strong:first-child { display: block; margin-bottom: 2px; }
+  .note p:last-child { margin-bottom: 0; }
+
+  ol.steps { counter-reset: s; list-style: none; margin: 0 0 12px; padding: 0; }
+  ol.steps > li {
+    counter-increment: s;
+    position: relative;
+    padding: 3px 0 12px 44px;
+  }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0; top: 2px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--surface);
+    font-weight: 700;
+    font-size: 14px;
+    display: grid;
+    place-items: center;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    margin: 0 0 14px;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; vertical-align: top; }
+  thead th {
+    background: var(--surface-2);
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  tbody tr + tr td { border-top: 1px solid var(--border); }
+  td.name { font-weight: 600; white-space: nowrap; }
+
+  kbd {
+    display: inline-block;
+    font: 600 13px system-ui, sans-serif;
+    padding: 2px 9px;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 7px;
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  .path {
+    font-family: ui-monospace, SFMono-Regular, Consolas, Menlo, monospace;
+    font-size: .88em;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 5px;
+    overflow-wrap: anywhere;
+  }
+  .dot {
+    display: inline-block;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: baseline;
+  }
+  .dot.green { background: #3dd68c; }
+  .dot.amber { background: #ffb020; }
+  .dot.red { background: #ff4d4d; }
+  .dot.gray { background: #8b96a6; }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding-top: 16px; }
+    nav.toc {
+      position: static;
+      max-height: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    header.hero h1 { font-size: 25px; }
+  }
+  @media (max-width: 480px) {
+    nav.toc ol { grid-template-columns: 1fr; }
+  }
+  @media print {
+    body { background: #fff; }
+    nav.toc { display: none; }
+    .layout { display: block; max-width: none; padding: 0; }
+    .table-wrap, header.hero { box-shadow: none; }
+    h2 { break-after: avoid; }
+    .note, .table-wrap { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc" aria-label="Sumário">
+    <p>Neste manual</p>
+    <ol>
+      <li><a href="#o-que-e">O que é o app</a></li>
+      <li><a href="#precisa">O que você precisa</a></li>
+      <li><a href="#primeiro-uso">Primeiro uso</a></li>
+      <li><a href="#painel">Painel</a></li>
+      <li><a href="#mapa">Mapa</a></li>
+      <li><a href="#rotas">Rotas</a></li>
+      <li><a href="#viagens">Registrar uma viagem</a></li>
+      <li><a href="#aba-viagem">Aba Viagem</a></li>
+      <li><a href="#falhas">Códigos de falha</a></li>
+      <li><a href="#config">Configurações</a></li>
+      <li><a href="#dados">O que cada dado significa</a></li>
+      <li><a href="#logs">Aba Logs</a></li>
+      <li><a href="#dicas">Uso no dia a dia</a></li>
+      <li><a href="#problemas">Problemas comuns</a></li>
+      <li><a href="#limites">Limitações</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Vitara OBD</h1>
+      <p class="sub">Manual do usuário</p>
+      <p>O Vitara OBD transforma o celular em um painel de bordo para o Suzuki (Grand) Vitara 2.0. Ele lê as informações do motor por um adaptador Bluetooth ligado ao conector de diagnóstico do carro e mostra rotação, temperatura, consumo, mapa, rotas e o histórico das suas viagens.</p>
+      <p>O app <strong>apenas lê</strong> informações. Ele não altera nada no carro e não apaga códigos de falha.</p>
+    </header>
+
+    <section>
+      <div class="note danger">
+        <strong>Segurança em primeiro lugar</strong>
+        <p>Não mexa no celular enquanto dirige. Deixe o aparelho em um suporte fixo, configure tudo com o carro parado e, se precisar operar o app em movimento, peça a um passageiro.</p>
+      </div>
+    </section>
+
+    <section id="o-que-e">
+      <h2>O que é o app</h2>
+      <p>O app tem cinco abas, na barra de baixo (ou na lateral esquerda, com o celular deitado):</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Aba</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Painel</td><td>Mostradores e blocos com os dados do carro em tempo real</td></tr>
+            <tr><td class="name">Mapa</td><td>Sua posição, bússola, cálculo de rotas e gravação de viagens</td></tr>
+            <tr><td class="name">Viagem</td><td>Distância, tempo, consumo e custo acumulados</td></tr>
+            <tr><td class="name">Logs</td><td>Registro do que o app está fazendo, útil quando algo não funciona</td></tr>
+            <tr><td class="name">Config</td><td>Adaptador, unidades, combustível, alarmes, leitura de falhas e demais ajustes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="precisa">
+      <h2>O que você precisa</h2>
+      <ul>
+        <li><strong>Celular Android</strong> versão 6.0 ou mais recente, com Bluetooth.</li>
+        <li><strong>Adaptador ELM327 Bluetooth</strong>, do tipo que encaixa no conector de diagnóstico do carro. O app foi testado com um ELM327 v1.5.</li>
+        <li><strong>Internet no celular</strong> para o mapa e o cálculo de rotas. Os dados do carro funcionam sem internet.</li>
+        <li><strong>Suporte veicular</strong> para o celular e, de preferência, um carregador: a tela fica ligada o tempo todo.</li>
+      </ul>
+      <div class="note">
+        <strong>Onde fica o conector</strong>
+        <p>O conector de diagnóstico fica sob o painel, do lado do motorista, próximo à coluna de direção. O adaptador só encaixa em uma posição.</p>
+      </div>
+    </section>
+
+    <section id="primeiro-uso">
+      <h2>Primeiro uso</h2>
+      <ol class="steps">
+        <li><strong>Encaixe o adaptador</strong> no conector do carro e <strong>ligue a ignição</strong>. Não é preciso dar a partida. Uma luz acende no adaptador.</li>
+        <li><strong>Pareie o adaptador com o celular.</strong> Abra as configurações de Bluetooth do Android, procure um dispositivo chamado <span class="path">OBDII</span> (ou parecido) e toque nele. Se pedir senha, tente <span class="path">1234</span> ou <span class="path">0000</span>.</li>
+        <li><strong>Abra o Vitara OBD</strong> e aceite a permissão de "dispositivos próximos". Sem ela o app não consegue falar com o adaptador.</li>
+        <li>Vá em <kbd>Config</kbd>, seção <strong>Adaptador</strong>, toque em <kbd>Escolher adaptador pareado</kbd> e selecione o seu.</li>
+        <li>Volte ao <kbd>Painel</kbd>. Em cerca de 5 segundos os dados começam a aparecer.</li>
+      </ol>
+      <p>Isso só precisa ser feito uma vez. Nas próximas vezes basta ligar a ignição e abrir o app: ele se conecta sozinho.</p>
+      <p>Ao abrir a aba <kbd>Mapa</kbd> pela primeira vez, o app pede a permissão de localização. Ela é usada para mostrar sua posição e gravar o trajeto.</p>
+    </section>
+
+    <section id="painel">
+      <h2>Painel</h2>
+      <p>É a tela principal. De cima para baixo:</p>
+
+      <h3>Linha de estado</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>O que aparece</th><th>Significado</th></tr></thead>
+          <tbody>
+            <tr><td><span class="dot amber"></span>Conectando ao adaptador…</td><td>O app está procurando o adaptador Bluetooth</td></tr>
+            <tr><td><span class="dot amber"></span>Iniciando comunicação com a ECU…</td><td>O adaptador respondeu; falta a central do motor responder (leva uns 4 segundos)</td></tr>
+            <tr><td><span class="dot green"></span>Recebendo dados</td><td>Tudo funcionando</td></tr>
+            <tr><td><span class="dot red"></span>Sem comunicação</td><td>Algo falhou. O motivo aparece ao lado e o app tenta de novo sozinho a cada 8 segundos</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>À direita aparece quantas leituras por segundo estão chegando (o normal é entre 3 e 4). Esse espaço também mostra avisos vindos do carro:</p>
+      <ul>
+        <li><strong>A/C</strong>: o ar‑condicionado está ligado.</li>
+        <li><strong>corte de combustível</strong>: você tirou o pé do acelerador com a marcha engatada e o motor não está gastando combustível.</li>
+        <li><strong>malha aberta</strong>: o motor está em aceleração forte e trabalhando com mistura enriquecida.</li>
+      </ul>
+
+      <h3>Mostradores</h3>
+      <p>Dois mostradores circulares grandes. Por padrão mostram <strong>rotação</strong> e <strong>velocidade</strong>, mas você escolhe o que cada um exibe em Config. A faixa vermelha indica a zona de atenção (rotação alta, motor quente).</p>
+
+      <h3>Blocos</h3>
+      <p>Abaixo dos mostradores ficam os blocos, um para cada dado que você escolheu acompanhar. Cada bloco mostra o nome, o valor, a unidade e um <strong>mini‑gráfico dos últimos 30 segundos</strong>. Quando não há leitura, o valor aparece como <span class="path">--</span>.</p>
+
+      <h3>Alarmes</h3>
+      <p>Quando um valor passa do limite configurado, o bloco fica <strong>vermelho</strong>, aparece uma <strong>faixa vermelha no topo</strong> com o valor e, se o som estiver ligado, toca um <strong>aviso sonoro</strong> a cada 4 segundos até a situação voltar ao normal.</p>
+      <div class="note warn">
+        <strong>Se o alarme de temperatura do motor disparar</strong>
+        <p>Pare em local seguro assim que possível e desligue o motor. Superaquecimento causa danos sérios. Só abra a tampa do reservatório com o motor frio.</p>
+      </div>
+    </section>
+
+    <section id="mapa">
+      <h2>Mapa</h2>
+      <p>Mostra sua posição com uma <strong>seta azul</strong> que aponta para onde o carro está indo.</p>
+
+      <h3>Cartão de informações</h3>
+      <p>No topo do mapa há um cartão com latitude, longitude, altitude, velocidade pelo GPS, precisão e a <strong>bússola</strong>: uma rosa dos ventos em que a marca vermelha indica o norte, mais o rumo em graus e o ponto cardeal (N, NE, L, SE, S, SO, O, NO).</p>
+
+      <h3>Aproximar e afastar</h3>
+      <ul>
+        <li>Movimento de <strong>pinça</strong> com dois dedos;</li>
+        <li><strong>toque duplo</strong> para aproximar;</li>
+        <li>botões <kbd>+</kbd> e <kbd>−</kbd> na lateral direita.</li>
+      </ul>
+
+      <h3>Girar o mapa</h3>
+      <p><strong>Toque na bússola</strong> do cartão. Cada toque passa ao modo seguinte:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Modo</th><th>Como o mapa se comporta</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Norte para cima</td><td>O norte fica sempre no topo, como em um mapa de papel</td></tr>
+            <tr><td class="name">Giro livre</td><td>Você gira o mapa com dois dedos para o ângulo que quiser</td></tr>
+            <tr><td class="name">Sempre para a frente</td><td>O mapa gira sozinho para o que está à sua frente ficar no topo da tela</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>O modo atual aparece na última linha do cartão.</p>
+
+      <h3>Botões</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Botão</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Mapa</kbd></td><td>Troca o tipo de mapa, configura os mini‑gráficos e abre as viagens salvas</td></tr>
+            <tr><td><kbd>Centralizar</kbd></td><td>Volta o mapa para a sua posição e passa a acompanhá‑la. Arrastar o mapa com o dedo desliga o acompanhamento</td></tr>
+            <tr><td><kbd>Iniciar viagem</kbd></td><td>Começa a gravar uma viagem (ver <a href="#viagens">Registrar uma viagem</a>)</td></tr>
+            <tr><td><kbd>Rota</kbd></td><td>Opções de rota (ver <a href="#rotas">Rotas</a>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tipos de mapa</h3>
+      <p>Em <kbd>Mapa</kbd> você escolhe entre <strong>ruas</strong>, <strong>terreno</strong> (com relevo) e <strong>satélite</strong>.</p>
+
+      <h3>Mini‑gráficos sobre o mapa</h3>
+      <p>Você pode manter até dois dados do carro visíveis por cima do mapa, com transparência. Por padrão são a velocidade e o consumo instantâneo. Em <kbd>Mapa</kbd> → <strong>Mini‑gráficos sobre o mapa…</strong> você define:</p>
+      <ul>
+        <li>qual dado aparece em cada um (ou nenhum);</li>
+        <li>em que <strong>canto</strong> da tela fica cada um;</li>
+        <li>a <strong>opacidade</strong>, de 20 % a 100 %.</li>
+      </ul>
+      <p>As mudanças aparecem na hora, atrás da janela de ajuste.</p>
+    </section>
+
+    <section id="rotas">
+      <h2>Rotas</h2>
+      <h3>Calcular uma rota</h3>
+      <ol class="steps">
+        <li>Na aba <kbd>Mapa</kbd>, encontre o destino no mapa.</li>
+        <li><strong>Toque e segure</strong> o dedo sobre o ponto.</li>
+        <li>Escolha <strong>Calcular rota até este ponto</strong>.</li>
+      </ol>
+      <p>Em poucos segundos aparece uma <strong>linha roxa</strong> pelas ruas. O cartão do topo passa a mostrar:</p>
+      <ul>
+        <li>a <strong>próxima manobra</strong> e a distância até ela, por exemplo "Vire à direita em Rua México · 67 m";</li>
+        <li>quanto <strong>falta</strong> em quilômetros e em tempo.</li>
+      </ul>
+      <p>Se você sair do caminho, a rota é recalculada sozinha.</p>
+
+      <h3>Menu Rota</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Opção</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Calcular rota até o destino da viagem</td><td>Aparece quando há uma viagem em andamento com destino marcado</td></tr>
+            <tr><td class="name">Recalcular a partir daqui</td><td>Refaz a rota da posição atual até o mesmo destino</td></tr>
+            <tr><td class="name">Ver os passos da rota</td><td>Lista todas as manobras, com a distância de cada trecho</td></tr>
+            <tr><td class="name">Remover a rota do mapa</td><td>Apaga a linha roxa e as instruções</td></tr>
+            <tr><td class="name">Abrir em outro app de navegação</td><td>Envia o destino para o Google Maps, Waze ou outro app instalado</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn">
+        <strong>O que as rotas não fazem</strong>
+        <p>As instruções aparecem só como texto na tela, <strong>sem voz</strong>. A rota não considera trânsito, pedágios nem interdições, e o tempo estimado não leva o trânsito em conta. Para navegação com voz e trânsito, use "Abrir em outro app de navegação". O cálculo precisa de internet.</p>
+      </div>
+    </section>
+
+    <section id="viagens">
+      <h2>Registrar uma viagem</h2>
+      <p>Serve para guardar o histórico completo de um percurso, por exemplo uma viagem do Rio de Janeiro a São Paulo: tudo o que o carro informou, o caminho feito e as paradas.</p>
+
+      <h3>Iniciar</h3>
+      <ol class="steps">
+        <li>Na aba <kbd>Mapa</kbd>, toque em <kbd>Iniciar viagem</kbd>.</li>
+        <li>Preencha o <strong>nome</strong> (ex.: "RJ → SP"), a <strong>origem</strong> (deixe em branco para usar onde você está) e o <strong>destino</strong> (ex.: "São Paulo, SP").</li>
+        <li>Toque em <kbd>Iniciar</kbd>.</li>
+      </ol>
+      <p>A partir daí o app grava, a cada segundo, todos os dados do carro e a posição do GPS. O mapa mostra a origem (<strong>A</strong>), o destino (<strong>B</strong>), o caminho já percorrido em azul e a rota calculada em roxo. O cartão mostra o tempo, a distância, o combustível e o consumo da viagem.</p>
+      <div class="note">
+        <strong>Se o destino não aparecer no mapa</strong>
+        <p>O app tenta localizar o destino pelo nome, o que depende de internet. Se não encontrar, o cartão avisa "Sem destino no mapa". Nesse caso, <strong>toque e segure</strong> no ponto de destino e escolha <strong>Definir como destino da viagem</strong>.</p>
+      </div>
+
+      <h3>Pausar</h3>
+      <p>Ao parar para abastecer, comer ou descansar, toque em <kbd>Pausar</kbd> e escolha o motivo:</p>
+      <ul>
+        <li><strong>Abastecimento</strong>: você pode informar os litros e o valor pago;</li>
+        <li><strong>Refeição</strong>, <strong>Descanso</strong>, <strong>Pedágio / parada rápida</strong> ou <strong>Outro</strong>, com uma observação opcional.</li>
+      </ul>
+      <p>Durante a pausa, o tempo e a distância não entram na conta da viagem. Para continuar, toque em <kbd>Retomar</kbd>.</p>
+
+      <h3>Finalizar</h3>
+      <p>Toque em <kbd>Finalizar</kbd> e confirme. A viagem é salva e aparece um resumo com tempos, distâncias, combustível, consumo, custo, velocidade e rotação máximas, temperatura máxima e a lista de pausas.</p>
+
+      <h3>Baixar os dados (ZIP)</h3>
+      <p>No resumo, toque em <kbd>Baixar ZIP</kbd> e escolha onde salvar. O arquivo contém:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Arquivo</th><th>Conteúdo</th><th>Como abrir</th></tr></thead>
+          <tbody>
+            <tr><td class="name">resumo.txt</td><td>O mesmo resumo mostrado na tela</td><td>Qualquer leitor de texto</td></tr>
+            <tr><td class="name">dados_veiculo.csv</td><td>Todos os dados do carro, segundo a segundo</td><td>Excel, Google Planilhas</td></tr>
+            <tr><td class="name">trajeto_gps.csv</td><td>As posições do GPS com hora, altitude e velocidade</td><td>Excel, Google Planilhas</td></tr>
+            <tr><td class="name">trajeto.gpx</td><td>O caminho percorrido, com origem, destino e pausas marcados</td><td>Google Earth e apps de mapas</td></tr>
+            <tr><td class="name">eventos.csv</td><td>Início, pausas (com motivo, litros e valor), retomadas e fim</td><td>Excel, Google Planilhas</td></tr>
+            <tr><td class="name">viagem.json</td><td>Todas as informações da viagem e as configurações usadas</td><td>Para uso técnico</td></tr>
+            <tr><td class="name">rota_calculada.gpx</td><td>A rota planejada, quando houve uma</td><td>Google Earth e apps de mapas</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Nas planilhas, as colunas são separadas por ponto e vírgula e os valores estão sempre em km/h, °C, litros e quilômetros, mesmo que você use outras unidades na tela.</p>
+
+      <h3>Viagens salvas</h3>
+      <p>Em <kbd>Mapa</kbd> → <strong>Viagens salvas…</strong> fica a lista das viagens concluídas. Toque em uma para ver o resumo, baixar o ZIP de novo ou excluir.</p>
+
+      <div class="note ok">
+        <strong>Se o app fechar no meio da viagem</strong>
+        <p>A viagem não se perde. Ao abrir o app de novo ela continua de onde parou. Só o trecho em que o app esteve fechado fica sem dados.</p>
+      </div>
+    </section>
+
+    <section id="aba-viagem">
+      <h2>Aba Viagem</h2>
+      <p>Mostra os números acumulados desde a última vez que você zerou. É independente das viagens gravadas no mapa: funciona como o hodômetro parcial do carro.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Grupo</th><th>O que mostra</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Viagem atual</td><td>Distância, tempo, velocidade média, consumo médio, combustível gasto, custo, CO₂ emitido, tempo parado com o motor ligado e combustível gasto parado</td></tr>
+            <tr><td class="name">Máximos da viagem</td><td>Velocidade, rotação e temperatura do motor mais altas</td></tr>
+            <tr><td class="name">Totais</td><td>Distância, combustível, consumo médio e custo desde sempre (ou desde a última vez que foram zerados)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><kbd>Zerar viagem</kbd> limpa a viagem atual e os máximos. <kbd>Zerar totais</kbd> limpa os totais e não pode ser desfeito.</p>
+      <p>Esses números são mantidos quando você fecha o app.</p>
+    </section>
+
+    <section id="falhas">
+      <h2>Códigos de falha</h2>
+      <p>Quando a central do motor detecta um problema, ela guarda um código. Para consultar:</p>
+      <ol class="steps">
+        <li>Com a ignição ligada e o app recebendo dados, abra <kbd>Config</kbd>.</li>
+        <li>Na seção <strong>Diagnóstico</strong>, toque em <kbd>Ler códigos de falha</kbd>.</li>
+      </ol>
+      <p>A leitura é feita na hora. Se não houver nada, aparece em verde "Nenhum código de falha armazenado". Se houver, cada código aparece com:</p>
+      <ul>
+        <li>o <strong>código</strong>, por exemplo P0120;</li>
+        <li>uma <strong>descrição</strong>, quando o código é dos mais comuns;</li>
+        <li>a <strong>situação</strong>: presente agora, armazenada (aconteceu, mas não está ocorrendo neste momento) ou intermitente, e se a luz de falha do painel está acesa.</li>
+      </ul>
+      <p>O botão <kbd>Ver um exemplo de como as falhas aparecem</kbd> mostra dois códigos inventados, só para você conhecer a tela.</p>
+      <div class="note warn">
+        <strong>Como usar essa informação</strong>
+        <p>O código indica <em>onde</em> a central percebeu algo errado, não a peça que deve ser trocada. Anote o código e leve a um mecânico de confiança. As descrições são genéricas e podem não corresponder exatamente à tabela da Suzuki. O app <strong>não apaga</strong> códigos.</p>
+      </div>
+    </section>
+
+    <section id="config">
+      <h2>Configurações</h2>
+      <p>Todos os ajustes são salvos na hora e valem imediatamente.</p>
+
+      <h3>Adaptador</h3>
+      <ul>
+        <li><kbd>Escolher adaptador pareado</kbd>: define qual dispositivo Bluetooth é o adaptador do carro.</li>
+        <li><strong>Mostrar dados prováveis</strong>: libera dois dados extras cuja interpretação ainda não foi confirmada (válvula de marcha lenta e tensão do sensor da borboleta). Eles aparecem marcados com <span class="path">*</span>.</li>
+      </ul>
+
+      <h3>Unidades</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ajuste</th><th>Opções</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Distância e velocidade</td><td>Quilômetros (km, km/h) ou milhas (mi, mph)</td></tr>
+            <tr><td class="name">Temperatura</td><td>Celsius ou Fahrenheit</td></tr>
+            <tr><td class="name">Pressão</td><td>kPa, bar ou psi</td></tr>
+            <tr><td class="name">Consumo</td><td>km/L, L/100 km ou mpg</td></tr>
+            <tr><td class="name">Volume de combustível</td><td>Litros ou galões</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Combustível e consumo</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ajuste</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Combustível</td><td>Gasolina comum (com etanol, a vendida no Brasil) ou gasolina pura. Afeta o cálculo de consumo</td></tr>
+            <tr><td class="name">Preço por litro</td><td>Usado para calcular o custo das viagens</td></tr>
+            <tr><td class="name">Símbolo da moeda</td><td>O que aparece antes dos valores (R$)</td></tr>
+            <tr><td class="name">Coeficientes de combustível e de distância</td><td>Ajuste fino para o app bater com a realidade (ver abaixo)</td></tr>
+            <tr><td class="name">Zerar o consumo durante o corte de combustível</td><td>Deixe ligado. Faz o app considerar consumo zero quando o motor realmente não está injetando</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <strong>Como calibrar o consumo</strong>
+        <p>O consumo mostrado é uma estimativa. Para aproximá‑lo do real:</p>
+        <ol>
+          <li>Encha o tanque, zere o hodômetro parcial do carro e toque em <kbd>Zerar viagem</kbd> no app.</li>
+          <li>Rode pelo menos 200 km com o app aberto durante todos os trajetos.</li>
+          <li>Encha o tanque de novo e anote os litros que couberam e os quilômetros do hodômetro.</li>
+          <li>Divida os <strong>litros da bomba</strong> pelo <strong>combustível da viagem</strong> mostrado no app. O resultado é o coeficiente de combustível.</li>
+          <li>Divida os <strong>quilômetros do hodômetro</strong> pela <strong>distância da viagem</strong> do app. O resultado é o coeficiente de distância.</li>
+        </ol>
+        <p>Exemplo: a bomba marcou 42 L e o app mostrou 38 L. O coeficiente de combustível é 42 ÷ 38 = 1,105. O valor 1,000 significa "sem correção".</p>
+      </div>
+
+      <h3>Painel</h3>
+      <ul>
+        <li><strong>Mostrador esquerdo</strong> e <strong>direito</strong>: o dado de cada mostrador circular.</li>
+        <li><strong>Mostrar mini‑gráfico nos blocos</strong>: desligue para deixar os blocos menores e caber mais na tela.</li>
+        <li><strong>Manter a tela sempre ligada</strong>: recomendado com o celular no suporte.</li>
+      </ul>
+
+      <h3>Sensores no painel</h3>
+      <p>Marque quais dados devem aparecer como blocos no Painel. Há atalhos para <kbd>Marcar todos</kbd>, voltar ao <kbd>Padrão</kbd> e <kbd>Limpar</kbd>.</p>
+
+      <h3>Alarmes</h3>
+      <p>Marque os que deseja e ajuste o limite de cada um:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Alarme</th><th>Limite inicial</th><th>Vem ligado?</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Motor superaquecendo</td><td>acima de 105 °C</td><td>Sim</td></tr>
+            <tr><td class="name">Bateria baixa</td><td>abaixo de 11,8 V</td><td>Sim</td></tr>
+            <tr><td class="name">Sobretensão do alternador</td><td>acima de 15,0 V</td><td>Sim</td></tr>
+            <tr><td class="name">Excesso de velocidade</td><td>acima de 110 km/h</td><td>Não</td></tr>
+            <tr><td class="name">Rotação alta</td><td>acima de 6000 rpm</td><td>Não</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Tocar som de alarme</strong> liga ou desliga o aviso sonoro. O aviso visual continua funcionando.</p>
+
+      <h3>Gravação</h3>
+      <p><strong>Gravar os dados em CSV</strong> salva todos os dados do carro em uma planilha, uma linha por segundo, sempre que o app estiver recebendo dados. É diferente de registrar uma viagem no mapa: aqui não há trajeto nem pausas, só os dados do carro. Os arquivos ficam na pasta mostrada na tela.</p>
+    </section>
+
+    <section id="dados">
+      <h2>O que cada dado significa</h2>
+
+      <h3>Lidos do carro</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dado</th><th>O que é</th><th>Valores típicos</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Velocidade</td><td>Velocidade informada pela central do motor</td><td>—</td></tr>
+            <tr><td class="name">Rotação do motor</td><td>Giros por minuto</td><td>750 a 800 em marcha lenta com o motor quente; mais alta a frio</td></tr>
+            <tr><td class="name">Temperatura do motor</td><td>Temperatura do líquido de arrefecimento</td><td>85 a 100 °C em uso normal</td></tr>
+            <tr><td class="name">Temperatura do ar admitido</td><td>Temperatura do ar que entra no motor</td><td>Um pouco acima da temperatura ambiente</td></tr>
+            <tr><td class="name">Vazão de ar (MAF)</td><td>Quanto ar o motor está aspirando</td><td>2 a 3 g/s em marcha lenta; sobe com a aceleração</td></tr>
+            <tr><td class="name">Posição da borboleta</td><td>O quanto o acelerador está aberto</td><td>0 % solto, 100 % com o pé no fundo</td></tr>
+            <tr><td class="name">Carga do motor</td><td>O quanto o motor está sendo exigido</td><td>15 a 20 % em marcha lenta</td></tr>
+            <tr><td class="name">Avanço de ignição</td><td>O momento da faísca, em graus</td><td>Cerca de 14° em marcha lenta</td></tr>
+            <tr><td class="name">Correção de combustível curta</td><td>Ajuste instantâneo que a central faz na mistura</td><td>Oscila perto de zero</td></tr>
+            <tr><td class="name">Correção de combustível longa</td><td>Ajuste aprendido ao longo do tempo</td><td>O ideal é ficar entre −10 % e +10 %</td></tr>
+            <tr><td class="name">Correção de combustível total</td><td>A soma das duas anteriores</td><td>—</td></tr>
+            <tr><td class="name">Sonda lambda</td><td>Sensor de oxigênio no escapamento</td><td>Oscila rápido entre 0,1 e 0,9 V com o motor quente</td></tr>
+            <tr><td class="name">Rotação‑alvo de marcha lenta</td><td>A rotação que a central quer manter em marcha lenta</td><td>Perto de 770 rpm; sobe com o ar‑condicionado ligado e a frio</td></tr>
+            <tr><td class="name">Tempo de injeção</td><td>Quanto tempo os injetores ficam abertos a cada ciclo</td><td>2,5 a 3 ms em marcha lenta; zero no corte de combustível</td></tr>
+            <tr><td class="name">Tensão da bateria (no conector)</td><td>Medida pelo adaptador</td><td>12,2 a 12,8 V com o motor parado; 13,8 a 14,5 V com o motor ligado</td></tr>
+            <tr><td class="name">Tensão vista pela ECU</td><td>A mesma tensão, medida pela central do motor</td><td>Igual à anterior, com pequena diferença</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <strong>Sobre as correções de combustível</strong>
+        <p>Valores positivos significam que a central está colocando mais combustível do que o previsto; negativos, menos. Uma correção longa que fica constantemente acima de +10 % ou abaixo de −10 % costuma indicar algo a verificar, como entrada falsa de ar ou sensor sujo. É um indício para conversar com o mecânico, não um diagnóstico.</p>
+      </div>
+
+      <h3>Calculados pelo app</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dado</th><th>O que é</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Consumo por hora</td><td>Litros por hora no ritmo atual. Útil em marcha lenta</td></tr>
+            <tr><td class="name">Consumo instantâneo</td><td>Quilômetros por litro neste momento. Aparece <span class="path">--</span> com o carro parado</td></tr>
+            <tr><td class="name">Consumo médio da viagem / total</td><td>Média desde a última vez que cada um foi zerado</td></tr>
+            <tr><td class="name">Distância, combustível, custo, tempo</td><td>Acumulados da viagem e totais</td></tr>
+            <tr><td class="name">Tempo parado e combustível gasto parado</td><td>Com o motor ligado e o carro parado (trânsito, semáforo)</td></tr>
+            <tr><td class="name">Velocidade média e máxima, rotação e temperatura máximas</td><td>Da viagem atual</td></tr>
+            <tr><td class="name">CO₂ emitido</td><td>Estimativa a partir do combustível gasto</td></tr>
+            <tr><td class="name">Aceleração longitudinal</td><td>Aceleração (positiva) ou frenagem (negativa), em "g"</td></tr>
+            <tr><td class="name">Relação de marcha</td><td>Quilômetros por hora para cada 1000 rpm. O valor muda a cada marcha, então indica qual está engatada</td></tr>
+            <tr><td class="name">Ciclo de trabalho dos injetores</td><td>Percentual do tempo em que os injetores ficam abertos</td></tr>
+            <tr><td class="name">Potência estimada</td><td>Estimativa aproximada da potência que o motor está entregando</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Este motor não tem sensor de pressão do coletor, por isso não há dados de pressão de admissão nem de vácuo.</p>
+    </section>
+
+    <section id="logs">
+      <h2>Aba Logs</h2>
+      <p>Mostra, em tempo real, o que o app está fazendo: tentativas de conexão, comandos trocados com o adaptador, alarmes e erros. No dia a dia você não precisa dela. Ela é útil quando algo não funciona.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Controle</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Filtro</td><td>"Mostrar tudo", "Info, avisos e erros" ou "Só avisos e erros"</td></tr>
+            <tr><td><kbd>Pausar</kbd></td><td>Congela a tela para você ler com calma</td></tr>
+            <tr><td><kbd>Limpar</kbd></td><td>Apaga o que está na tela</td></tr>
+            <tr><td><kbd>Enviar</kbd></td><td>Compartilha o log por e‑mail, WhatsApp ou outro app, para pedir ajuda</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Avisos aparecem em amarelo e erros em vermelho.</p>
+    </section>
+
+    <section id="dicas">
+      <h2>Uso no dia a dia</h2>
+      <h3>Celular em pé ou deitado</h3>
+      <p>O app acompanha a posição do celular. Deitado, as abas vão para a lateral esquerda, o Painel mostra os mostradores à esquerda e os blocos à direita, e a aba Viagem se divide em duas colunas. Girar o celular não interrompe a leitura nem a gravação.</p>
+
+      <h3>Botão voltar</h3>
+      <ul>
+        <li>Em qualquer aba, <strong>voltar leva ao Painel</strong>.</li>
+        <li>No Painel, <strong>dois toques seguidos em voltar</strong> salvam tudo e fecham o app. Se houver uma viagem sendo gravada, ela fica guardada e continua quando o app for aberto de novo.</li>
+      </ul>
+
+      <h3>Manter o app aberto</h3>
+      <p>Para o app continuar lendo e gravando, deixe‑o aberto na tela. Se você trocar de app por muito tempo, o Android pode encerrá‑lo. Deixe a opção "Manter a tela sempre ligada" ativada e o celular no carregador.</p>
+
+      <h3>Ao desligar o carro</h3>
+      <p>Com a ignição desligada o app mostra "Sem comunicação" e fica tentando reconectar. Você pode fechá‑lo com dois toques em voltar. Se o adaptador tiver luz acesa mesmo com a chave desligada, vale retirá‑lo quando o carro for ficar parado por muitos dias, para não consumir a bateria.</p>
+    </section>
+
+    <section id="problemas">
+      <h2>Problemas comuns</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>O que acontece</th><th>O que fazer</th></tr></thead>
+          <tbody>
+            <tr><td>"Escolha o adaptador em Config"</td><td>Faça os passos 2 e 4 do <a href="#primeiro-uso">Primeiro uso</a></td></tr>
+            <tr><td>O adaptador não aparece na lista</td><td>Ele precisa ser pareado antes nas configurações de Bluetooth do Android. Confira se a ignição está ligada e a luz do adaptador acesa</td></tr>
+            <tr><td>"Bluetooth desligado"</td><td>Ligue o Bluetooth do celular</td></tr>
+            <tr><td>"Permissão de Bluetooth negada"</td><td>Nas configurações do Android, abra Apps → Vitara OBD → Permissões e libere "Dispositivos próximos"</td></tr>
+            <tr><td>"Não foi possível conectar ao adaptador"</td><td>Confira se o adaptador está bem encaixado e a ignição ligada. Veja se outro app ou outro celular não está usando o adaptador. Tire e recoloque o adaptador</td></tr>
+            <tr><td>"A ECU não aceitou o início da comunicação"</td><td>Normal logo depois de desligar e ligar a ignição. Aguarde: o app tenta de novo a cada 8 segundos. Se persistir, desligue a ignição, espere 10 segundos e ligue de novo</td></tr>
+            <tr><td>"O adaptador recusou" seguido de um comando</td><td>O adaptador não é compatível. Alguns modelos baratos não têm todas as funções necessárias; experimente outro ELM327</td></tr>
+            <tr><td>Os dados param de repente</td><td>O app reconecta sozinho em alguns segundos. Se acontecer muito, verifique o encaixe do adaptador e mantenha o celular perto dele</td></tr>
+            <tr><td>O mapa aparece cinza, só com uma grade</td><td>Falta internet. As áreas que você já visitou ficam guardadas e aparecem mesmo sem conexão</td></tr>
+            <tr><td>"Não foi possível calcular a rota"</td><td>Falta internet ou o serviço de rotas está fora do ar. Tente de novo em instantes ou use "Abrir em outro app de navegação"</td></tr>
+            <tr><td>"Aguardando posição do GPS…"</td><td>Vá para um local aberto e confira se a localização do celular está ligada. A primeira posição pode demorar um ou dois minutos</td></tr>
+            <tr><td>"Permissão de localização negada"</td><td>Nas configurações do Android, abra Apps → Vitara OBD → Permissões e libere "Localização"</td></tr>
+            <tr><td>A seta do mapa aponta para o lado errado com o carro parado</td><td>A bússola do celular sofre interferência do metal do carro. Em movimento a direção se corrige</td></tr>
+            <tr><td>O consumo não bate com o do posto</td><td>Faça a calibração descrita em <a href="#config">Combustível e consumo</a></td></tr>
+            <tr><td>Um bloco mostra <span class="path">--</span></td><td>O carro não está enviando esse dado no momento. Vários ficam vazios com o motor desligado, e o consumo instantâneo fica vazio com o carro parado</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Se nada resolver, abra a aba <kbd>Logs</kbd>, toque em <kbd>Enviar</kbd> e mande o conteúdo para quem dá suporte ao app.</p>
+    </section>
+
+    <section id="limites">
+      <h2>Limitações</h2>
+      <ul>
+        <li>O app foi feito para o <strong>Suzuki (Grand) Vitara 2.0 a gasolina</strong>. Não funciona em outros carros.</li>
+        <li>O <strong>consumo é uma estimativa</strong> calculada a partir do ar que o motor aspira. Sem calibração, pode diferir do consumo real.</li>
+        <li>A <strong>velocidade</strong> mostrada é a informada pela central do motor e pode diferir um pouco do velocímetro.</li>
+        <li>A <strong>potência estimada</strong> é uma aproximação grosseira, apenas indicativa.</li>
+        <li>As <strong>rotas</strong> não têm voz nem trânsito, e dependem de um serviço público gratuito que pode ficar indisponível.</li>
+        <li>O <strong>mapa</strong> precisa de internet nas áreas ainda não visitadas.</li>
+        <li>Os <strong>códigos de falha</strong> são apenas lidos, nunca apagados, e as descrições são genéricas.</li>
+        <li>O app só lê a central do <strong>motor</strong>. Não acessa ABS, airbag nem câmbio.</li>
+        <li>Só funciona com adaptadores <strong>Bluetooth clássico</strong>. Modelos Wi‑Fi ou Bluetooth LE não são compatíveis.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Vitara OBD · Manual do usuário
+    </footer>
+  </main>
+</div>
+</body>
+</html>

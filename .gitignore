@@ -25,3 +25,21 @@ replay_pid*
 
 # Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
 .kotlin/
+
+# Android / Gradle
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+captures/
+.externalNativeBuild/
+.cxx/
+
+# O wrapper do Gradle precisa do seu .jar, apesar da regra *.jar acima
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+.vscode/
